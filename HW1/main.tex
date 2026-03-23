@@ -1,0 +1,176 @@
+\documentclass[12pt]{article}
+\usepackage[a4paper]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem*{proof*}{Proof}
+
+\title{Homework \#1}
+\author{Vanja Stojanovi\'c}
+\date{March 2026}
+
+\begin{document}
+
+\maketitle
+
+\section{Connected components}
+
+We assume a graph $G$ s.t. $|V(G)| = n$ and $|E(G)| = m$, and it contains $c$ connected components. We prove the following:
+
+\begin{proposition}
+  \[
+    n - c \leq m \leq \binom{n-c+1}{2}
+  \]
+\end{proposition}
+
+\begin{proof}
+  We proceed with induction on $n$ for the first inequality.
+
+  \noindent
+  \textbf{Base case (n = 1)}. It trivially follows that $c = 1$ and $m=0$, hence vacuously $1 - 1 = 0 \leq 0$.
+
+  \noindent
+  \textbf{Induction hypothesis (IH)}. We assume the relation holds for $n$.
+
+  \noindent
+  \textbf{Induction step}. Assume for a graph $G$ with $V(G) = n$.
+
+  Let $G'$ be the graph we obtain by adding a vertex $v$ to $G$. By the IH our inequality holds for $G$. When we add a vertex $v$ to $G$, we can arbitrarily choose its degree in the interval $0 \leq \text{deg}(v) \leq n$, hence we increase the number of vertices to $n' = n + 1$, the number of connected components can stay the same or increase by one if $\text{deg}(v) = 0$ and we increase the number of edges to $m' = m + \text{deg}(v)$.
+
+  \noindent
+  If $\text{deg}(v) \geq 1$, then $c'$ in $G'$ can only decrease or stay the same. If $v$ connects to $k$ distinct components (where $k \leq \deg(v)$), then $c' = c - k + 1$:
+  \begin{gather}
+    (n + 1) - (c - k + 1) \leq m + \text{deg}(v)\\
+    n - c + k \leq m + \text{deg}(v)
+  \end{gather}
+
+  \noindent
+  which holds by the IH and the fact that  $k \leq \deg(v)$.
+
+  \noindent
+  If $\text{deg}(v) = 0$, then
+  \begin{gather}
+    (n + 1) - (c + 1) \leq m + 0\\
+    n - c \leq m
+  \end{gather}
+
+  \noindent
+  which again holds by the IH, proving our induction step.
+
+  For the second inequality, let $n_i$ denote the number of vertices in component $i$. Then $n = \sum_{i=1}^{c} n_i$ with $n_i \geq 1$, and each component has at most $\binom{n_i}{2}$ edges, so
+  \[
+    m \leq \sum_{i=1}^{c} \binom{n_i}{2}.
+  \]
+  We claim this sum is maximized when one component has $n - c + 1$ vertices and the remaining $c - 1$ are singletons. To see this, suppose two components have $n_a \geq 2$ and $n_b \geq 2$. Moving a vertex from $b$ to $a$ changes the sum by
+  \[
+    \binom{n_a + 1}{2} + \binom{n_b - 1}{2} - \binom{n_a}{2} - \binom{n_b}{2} = n_a - (n_b - 1) = n_a - n_b + 1.
+  \]
+  If $n_a \geq n_b$, this is positive, so the sum strictly increases. Repeating this process, we concentrate all non-singleton vertices into one component, giving
+  \[
+    m \leq \binom{n - c + 1}{2}.
+  \]
+
+\end{proof}
+
+\noindent
+By Harary's theorem \cite{harary1969graph}, a disconnected graph on $n$ vertices has at most $\binom{n-1}{2}$ edges. This follows directly from our upper bound with $c \geq 2$:
+
+\begin{corollary}
+  If $m > \binom{n-1}{2}$, then $G$ is connected.
+\end{corollary}
+
+\begin{proof}
+  By contrapositive. If $G$ is disconnected ($c \geq 2$), then by Proposition~1,
+  $m \leq \binom{n - c + 1}{2} \leq \binom{n-1}{2}$.
+\end{proof}
+
+\begin{remark}
+  This criterion is not practically useful for real networks. Most real-world graphs, like social networks \cite{barabasi1999emergence}, internet topology, and biological networks are sparse, with $m = O(n)$ or $O(n \log n)$, yet are typically connected. The threshold $\binom{n-1}{2} = O(n^2)$ is far too conservative. For instance, Erd\H{o}s and R\'enyi \cite{erdos1959random} showed that the sharp threshold for connectivity in the random graph $G(n,p)$ is $p = \frac{\ln n}{n}$, corresponding to $m \approx \frac{n \ln n}{2}$, which is much smaller than $O(n^2)$.
+\end{remark}
+
+
+\section{Node linking probability}
+
+We consider such a random graph $G$, where an edge between $i \in V(G)$ and $j \in V(G)$ is present with probability $p_{ij}$. The probability is proportional to $p_{ij} ~ v_i v_j$, where $v_i \geq 0$ is some number associated with node $i$.
+
+
+\begin{proposition}
+  \label{prop:exp_val_of_node_degree}
+  The expected node degree $\mathbb E(k_i)$ of a node $i$ is proportional to $v_i$, where $k_i = deg(i)$.
+\end{proposition}
+
+\begin{proof}
+  Since each edge is a Bernoulli trial, we can express the expected value of the node degree of $i \in V(G)$ as
+  \[\mathbb E(k_i) = \sum_{j \neq i} p_{ij} = \sum_{j \neq i} \alpha v_i v_j = \alpha v_i
+  \sum_{j \neq i} v_j\]
+
+  \noindent
+  hence $\mathbb E(k_i) = Cv_i$, where $C = \alpha \sum_{j \neq i} v_j$ and $\alpha$ represents the unknown proportionality constant.
+\end{proof}
+
+
+We can now express $p_{ij}$ in terms of the expected node degree.
+
+\begin{proposition}
+  \label{prop:prob_in_terms_of_exp_deg}
+  We can write the probability $p_{ij}$ in terms of the expected vertex degree of vertices $i$ and $j$.
+\end{proposition}
+
+\begin{proof}
+By Proposition \ref{prop:exp_val_of_node_degree} we have $\mathbb E(k_i) = v_i \big(\alpha \sum_{j \neq i} v_j\big)$. We substitute it into the relation for $p_{ij}$
+
+\begin{align*}
+  p_{ij} &= \alpha \cdot \frac{\mathbb E(k_i)}{\alpha \sum_j v_j} \cdot \frac{\mathbb E(k_j)}{\alpha \sum_j v_j}\\
+  &= \frac{\mathbb E(k_i) \mathbb E(k_j)}{\alpha \big(\sum_j v_j\big)^2}\\
+  &= \frac{\mathbb E(k_i) \mathbb E(k_j)}{\alpha \Big(\sum_j v_j\Big) \Big(\sum_l v_l\Big)}\\
+  &= \frac{\mathbb E(k_i) \mathbb E(k_j)}{\sum_l \alpha v_l \Big(\sum_j v_j\Big)}\\
+  &= \frac{\mathbb E(k_i) \mathbb E(k_j)}{
+  \sum_l \mathbb{E}(k_l)}\\
+\end{align*}
+
+where we use Proposition \ref{prop:exp_val_of_node_degree} in the last step.
+\end{proof}
+
+The derivation in the proof of Proposition \ref{prop:prob_in_terms_of_exp_deg} is formally known as the Chung-Lu model \cite{chung2002connected}.
+
+
+\section{Random node selection}
+
+\section{Weak \& strong connectivity}
+
+\section{Is Java software scale-free?}
+
+\section{Five networks problem}
+
+\section{Who to vaccinate?}
+
+
+
+\bibliographystyle{plain}
+\begin{thebibliography}{9}
+  \bibitem{harary1969graph}
+  F.~Harary, \emph{Graph Theory}, Addison-Wesley, 1969.
+
+  \bibitem{barabasi1999emergence}
+  A.-L.~Barab\'asi and R.~Albert,
+  Emergence of scaling in random networks,
+  \emph{Science}, 286(5439):509--512, 1999.
+
+  \bibitem{chung2002connected}
+  F.~Chung and L.~Lu,
+  Connected components in random graphs with given expected degree sequences,
+  \emph{Annals of Combinatorics}, 6:125--145, 2002.
+
+  \bibitem{erdos1959random}
+  P.~Erd\H{o}s and A.~R\'enyi,
+  On random graphs I,
+  \emph{Publicationes Mathematicae Debrecen}, 6:290--297, 1959.
+\end{thebibliography}
+
+\end{document}
