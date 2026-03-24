@@ -3,6 +3,8 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{amsthm}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
 
 \theoremstyle{definition}
 \newtheorem{theorem}{Theorem}
@@ -141,6 +143,37 @@ The derivation in the proof of Proposition \ref{prop:prob_in_terms_of_exp_deg} i
 
 
 \section{Random node selection}
+
+Assume for a graph $G$. We design an algorithm which takes in a graph (network) data structure representation, and chooses a random node (vertex) in $O(1)$, where the probability of a node being chosen is $p = \frac{deg(i)}{2m}$ where $i \in V(G)$.
+
+\begin{algorithm}[H]
+  \label{algo:random_node_selection}
+  \caption{Degree-proportional node selection}
+  \begin{algorithmic}[1]
+    \Require Edge list $E = [e_1, e_2, \ldots, e_{2m}]$ containing both endpoints of each edge
+    \State $idx \gets \text{UniformRandom}(1, 2m)$
+    \State \Return $E[idx]$
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{theorem}
+  Algorithm \ref{algo:random_node_selection} selects a node with probability $P(i) = \frac{deg(i)}{2m}$.
+\end{theorem}
+
+\begin{proof}
+  Assume $E$ is the edge list inputted into the algorithm. The edge list is constructed out of both endpoints of all edges, since each edge has 2 endpoints, the number of elements in the list is $2m$.
+  \noindent
+  Hence, when picking a node uniformly at random from the list, we can write the following equation
+  \[
+    P(i) = \frac{|\{x: x\in E \wedge x = i\}|}{2m}
+  \]
+
+  \noindent
+  since each vertex will appear exactly as many times in the list as is the number of its edges
+  \[
+    P(i) = \frac{deg(i)}{2m}
+  \]
+\end{proof}
 
 \section{Weak \& strong connectivity}
 
