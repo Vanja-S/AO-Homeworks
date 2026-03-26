@@ -325,7 +325,10 @@ The code used to compute the structural properties:
 
 \section{Who to vaccinate?}
 
+The second scheme (vaccinate a random acquaintance) is strictly better.
 
+\noindent
+This is due to the following: selecting a node uniformly at random yields an expected spreading potential proportional to $\mathbb E(k^2)$. In the second scheme, following a random edge from a random node reaches a node of degree $k$ with probability proportional to $k \cdot p_k$ rather than $p_k$, which is degree-biased sampling. The expected spreading potential of the vaccinated acquaintance is thus proportional to $\mathbb E(k^3) / \mathbb E(k)$, which exceeds $\mathbb E(k^2)$ for any non-degenerate degree distribution. This is an application of the \emph{friendship paradox} \cite{newman2010networks}: a random neighbor of a random node has, on average, higher degree than a random node itself. Since spreading probability is proportional to $k^2$, the second scheme systematically removes higher-risk nodes from the network, providing more effective immunization with the same number of vaccines.
 
 \bibliographystyle{plain}
 \begin{thebibliography}{9}
