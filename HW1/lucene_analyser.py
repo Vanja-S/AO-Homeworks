@@ -53,12 +53,30 @@ def mle_gamma(degrees, k_min):
 def plot_distributions(total_ks, total_pk, in_ks, in_pk, out_ks, out_pk):
     fig, ax = plt.subplots(figsize=(8, 6))
 
-    ax.scatter(total_ks, [total_pk[k] for k in total_ks],
-               c="black", s=20, label="Total degree $p_k$", zorder=3)
-    ax.scatter(in_ks, [in_pk[k] for k in in_ks],
-               c="blue", s=20, label="In-degree $p_{k^{in}}$", zorder=3)
-    ax.scatter(out_ks, [out_pk[k] for k in out_ks],
-               c="red", s=20, label="Out-degree $p_{k^{out}}$", zorder=3)
+    ax.scatter(
+        total_ks,
+        [total_pk[k] for k in total_ks],
+        c="black",
+        s=20,
+        label="Total degree $p_k$",
+        zorder=3,
+    )
+    ax.scatter(
+        in_ks,
+        [in_pk[k] for k in in_ks],
+        c="blue",
+        s=20,
+        label="In-degree $p_{k^{in}}$",
+        zorder=3,
+    )
+    ax.scatter(
+        out_ks,
+        [out_pk[k] for k in out_ks],
+        c="red",
+        s=20,
+        label="Out-degree $p_{k^{out}}$",
+        zorder=3,
+    )
 
     ax.set_xscale("log")
     ax.set_yscale("log")
@@ -84,9 +102,9 @@ if __name__ == "__main__":
 
     plot_distributions(total_ks, total_pk, in_ks, in_pk, out_ks, out_pk)
 
-    print("\n--- MLE power-law exponents ---")
-    k_min = 3
-    for name, deg_dict in [("In", in_deg), ("Out", out_deg)]:
+    print("\nMLE power-law exponents")
+    k_min = 5
+    for name, deg_dict in [("Total", total_deg), ("In", in_deg), ("Out", out_deg)]:
         degrees = [k for k in deg_dict.values() if k > 0]
         gamma, n_used = mle_gamma(degrees, k_min)
         if gamma:

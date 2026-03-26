@@ -6,6 +6,15 @@
 \usepackage{graphicx}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
+\usepackage{listings}
+\lstset{
+  language=Python,
+  basicstyle=\ttfamily\footnotesize,
+  breaklines=true,
+  frame=single,
+  numbers=left,
+  numberstyle=\tiny,
+}
 
 \theoremstyle{definition}
 \newtheorem{theorem}{Theorem}
@@ -223,7 +232,7 @@ We analyze the Lucene search engine class dependency network \cite{subelj2011com
 \end{figure}
 
 \noindent
-Using the MLE formula from \cite{barabasi2016network} with $k^{\cdot}_{\min} = 3$, computed separately for in- and out-degree:
+Using the MLE formula from \cite{barabasi2016network} with $k^{\cdot}_{\min} = 5$, computed separately for in- and out-degree:
 \[
   \gamma_{\cdot} = 1 + n_{\cdot} \left( \sum_{i=1}^{n} \ln \frac{k^{\cdot}_i}{k^{\cdot}_{\min} - \frac{1}{2}} \cdot \delta(k^{\cdot}_i \geq k^{\cdot}_{\min}) \right)^{-1}
 \]
@@ -231,13 +240,15 @@ Using the MLE formula from \cite{barabasi2016network} with $k^{\cdot}_{\min} = 3
 \noindent
 where $\delta(k^{\cdot}_i \geq k^{\cdot}_{\min})$ is the indicator function and $n_{\cdot} \leq n$ is the number of nodes with $k^{\cdot}_i \geq k^{\cdot}_{\min}$. We obtain:
 \begin{itemize}
-  \item \textbf{In-degree}: $\gamma_{\text{in}} \approx 1.75$ ($n_{\text{in}} = 471$). Shows the clearest power-law behavior on the log-log plot. This is consistent with preferential attachment \cite{barabasi1999emergence}: widely-used utility classes (interfaces, base classes) accumulate dependencies from many other classes.
-  \item \textbf{Out-degree}: $\gamma_{\text{out}} \approx 2.46$ ($n_{\text{out}} = 1738$). Drops off more steeply with visible curvature, deviating from a pure power-law. This is expected since out-degree represents how many dependencies a class has, which is constrained by software design principles (limited coupling, single responsibility), imposing an effective upper bound.
-  \item \textbf{Total degree}: a mixture of both distributions, sitting between in- and out-degree on the log-log plot.
+  \item \textbf{In-degree}: appears scale-free, roughly linear on the log-log plot. $\gamma_{\text{in}} \approx 1.80$ ($n_{\text{in}} = 315$). This is consistent with preferential attachment \cite{barabasi1999emergence}: widely-used utility classes (interfaces, base classes) accumulate dependencies from many other classes.
+  \item \textbf{Out-degree}: appears scale-free, though with more curvature than in-degree. $\gamma_{\text{out}} \approx 3.37$ ($n_{\text{out}} = 917$). The steeper exponent reflects that out-degree (how many dependencies a class has) is more constrained by software design principles such as limited coupling.
+  \item \textbf{Total degree}: appears scale-free as a mixture of both distributions. $\gamma_{\text{total}} \approx 2.47$ ($n_{\text{total}} = 1296$), sitting between in- and out-degree on the log-log plot.
 \end{itemize}
 
 \noindent
-In summary, the in-degree distribution appears scale-free, while the out-degree distribution does not follow a clean power-law due to design constraints on class coupling.
+The code used to produce the plot and compute the exponents:
+
+\lstinputlisting{lucene_analyser.py}
 
 \section{Five networks problem}
 
