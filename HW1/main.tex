@@ -3,6 +3,7 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{amsthm}
+\usepackage{graphicx}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 
@@ -177,7 +178,66 @@ Assume for a graph $G$. We design an algorithm which takes in a graph (network) 
 
 \section{Weak \& strong connectivity}
 
+For this section, we assume for a digraph $D$. If we were to apply the depth-first search (DFS hereon) to $D$ and take into account the three given criteria, the result would be:
+
+\begin{enumerate}
+  \item \textbf{If we follow the links as if the ordered pair would be unordered}. Then the algorithm would be equivalent as if we took the unoriented graph $G$ of $D$ and applied the DFS on it. Hence we would get weakly connected components of $D$.
+  \item \textbf{If we follow the links in the direction of the ordered pair}. We get the "visibility" graph of some vertex, i.e. which vertices we can reach starting at some vertex.
+  \item \textbf{If we follow the links in the opposite direction of the ordered pair}. We get the "reverse-visibility" graph of some vertex, i.e. which vertices can reach that vertex.
+\end{enumerate}
+
+\noindent
+From answers 2 and 3, vertex $u$ is in the same SCC as $v$ iff $u$ is reachable from $v$ following directed edges, and $v$ is reachable from $u$. We use this to find all SCCs:
+
+\begin{algorithm}[H]
+  \label{algo:scc}
+  \caption{Strongly connected components via forward and backward DFS}
+  \begin{algorithmic}[1]
+    \Require Digraph $D = (V, E)$
+    \Ensure Set of all SCCs
+    \State $\textit{unvisited} \gets V$
+    \State $\textit{SCCs} \gets \emptyset$
+    \While{$\textit{unvisited} \neq \emptyset$}
+      \State Pick any $v \in \textit{unvisited}$
+      \State $F \gets \text{DFS}(v, D)$ \Comment{vertices reachable from $v$}
+      \State $B \gets \text{DFS}(v, D^R)$ \Comment{vertices that can reach $v$}
+      \State $\textit{SCC}(v) \gets F \cap B$
+      \State $\textit{SCCs} \gets \textit{SCCs} \cup \{\textit{SCC}(v)\}$
+      \State $\textit{unvisited} \gets \textit{unvisited} \setminus \textit{SCC}(v)$
+    \EndWhile
+    \State \Return $\textit{SCCs}$
+  \end{algorithmic}
+\end{algorithm}
+
+Implementing the algorithm and running it on the \texttt{enron.net} network, we get that the network has 78,058 strongly connected components, and the larget one has 9,164 of vertices. This is expected for a communication network like Enron's email graph. Most vertices are in small SCCs (many singletons — people who only sent or only received emails), while there's one large SCC forming the core of bidirectional communication.
+
 \section{Is Java software scale-free?}
+
+We analyze the Lucene search engine class dependency network \cite{subelj2011community} with $n = 2956$ vertices and $m = 10872$ arcs. Figure~\ref{fig:lucene_deg} shows the degree distributions on a log-log plot.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.8\textwidth]{build/lucene_degree_distributions.pdf}
+  \caption{Degree distributions of the Lucene class dependency network.}
+  \label{fig:lucene_deg}
+\end{figure}
+
+\noindent
+Using the MLE formula from \cite{barabasi2016network} with $k^{\cdot}_{\min} = 3$, computed separately for in- and out-degree:
+\[
+  \gamma_{\cdot} = 1 + n_{\cdot} \left( \sum_{i=1}^{n} \ln \frac{k^{\cdot}_i}{k^{\cdot}_{\min} - \frac{1}{2}} \cdot \delta(k^{\cdot}_i \geq k^{\cdot}_{\min}) \right)^{-1}
+\]
+
+\noindent
+where $\delta(k^{\cdot}_i \geq k^{\cdot}_{\min})$ is the indicator function and $n_{\cdot} \leq n$ is the number of nodes with $k^{\cdot}_i \geq k^{\cdot}_{\min}$. We obtain:
+\begin{itemize}
+  \item \textbf{In-degree}: $\gamma_{\text{in}} \approx 1.75$ ($n_{\text{in}} = 471$). Shows the clearest power-law behavior on the log-log plot. This is consistent with preferential attachment \cite{barabasi1999emergence}: widely-used utility classes (interfaces, base classes) accumulate dependencies from many other classes.
+  \item \textbf{Out-degree}: $\gamma_{\text{out}} \approx 2.46$ ($n_{\text{out}} = 1738$). Drops off more steeply with visible curvature, deviating from a pure power-law. This is expected since out-degree represents how many dependencies a class has, which is constrained by software design principles (limited coupling, single responsibility), imposing an effective upper bound.
+  \item \textbf{Total degree}: a mixture of both distributions, sitting between in- and out-degree on the log-log plot.
+\end{itemize}
+
+\noindent
+In summary, the in-degree distribution appears scale-free, while the out-degree distribution does not follow a clean power-law due to design constraints on class coupling.
 
 \section{Five networks problem}
 
@@ -204,6 +264,14 @@ Assume for a graph $G$. We design an algorithm which takes in a graph (network) 
   P.~Erd\H{o}s and A.~R\'enyi,
   On random graphs I,
   \emph{Publicationes Mathematicae Debrecen}, 6:290--297, 1959.
+
+  \bibitem{subelj2011community}
+  L.~\v{S}ubelj and M.~Bajec,
+  Community structure of complex software systems: Analysis and applications,
+  \emph{Physica A}, 390(16):2968--2975, 2011.
+
+  \bibitem{barabasi2016network}
+  A.-L.~Barab\'asi, \emph{Network Science}, Cambridge University Press, 2016.
 \end{thebibliography}
 
 \end{document}
