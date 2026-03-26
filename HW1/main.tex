@@ -252,6 +252,77 @@ The code used to produce the plot and compute the exponents:
 
 \section{Five networks problem}
 
+We are given five networks in edge list format and must identify each by examining structural properties. Two of the networks are directed. We compute the following metrics for each network: number of nodes $n$, number of edges/arcs, average degree $\mathbb E (k)$, maximum degree, median degree, clustering coefficient $C$ (estimated via random sampling of 5000 nodes), and directedness (by comparing arc count to undirected edge count, if arcs $>$ undirected edges, the graph contains reciprocated directed edges).
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\textwidth]{build/five_networks_degree_dist.pdf}
+  \caption{Degree distributions of the five networks on log-log scale.}
+  \label{fig:five_nets}
+\end{figure}
+
+\begin{table}[h]
+  \centering
+  \footnotesize
+  \begin{tabular}{l r r r r r r r r}
+    \hline
+    Network & $n$ & lines & $m$ (undir.) & $\mathbb E (k)$ & $k_{\max}$ & $\tilde{k}$ & $C$ & recip. \\
+    \hline
+    \texttt{network\_1} & 291,934 & 1,399,248 & 1,037,011 & 7.10 & 10,721 & 2 & 0.49 & 0.259 \\
+    \texttt{network\_2} & 189,207 & 703,484 & 703,484 & 7.44 & 22 & 7 & 0.00 & 0.000 \\
+    \texttt{network\_3} & 94,093 & 766,258 & 766,258 & 16.29 & 5,311 & 3 & 0.00 & 0.000 \\
+    \texttt{network\_4} & 202,275 & 510,180 & 509,097 & 5.03 & 2,803 & 1 & 0.16 & 0.002 \\
+    \texttt{network\_5} & 83,159 & 5,510,251 & 5,510,251 & 132.52 & 3,257 & 58 & 0.62 & 0.000 \\
+    \hline
+  \end{tabular}
+  \caption{Structural properties of the five networks. $\tilde{k}$ denotes median degree.}
+  \label{tab:five_nets}
+\end{table}
+
+\noindent
+\textbf{Step 1: Identify directed networks.} Comparing arc count (lines) to undirected edge count: \texttt{network\_1} has 1,399,248 arcs but only 1,037,011 undirected edges, indicating directed edges with 25.9\% reciprocity. \texttt{network\_4} has 510,180 arcs vs.\ 509,097 undirected edges, a small but nonzero difference (1,083 reciprocated arcs, 0.2\% reciprocity), indicating a directed network. The remaining three are undirected.
+
+\noindent
+\textbf{Step 2: Identify the Erd\H{o}s-R\'enyi graph.} \texttt{network\_2} has a maximum degree of only 22 across 189,207 nodes, a median of 7, and zero clustering. The degree distribution (Figure~\ref{fig:five_nets}) shows a narrow bell shape on the log-log plot, consistent with a Poisson distribution rather than a power law. This matches the $G(n,p)$ model \cite{erdos1959random}.
+
+\vspace{0.5em}
+\noindent
+$\Rightarrow$ \textbf{\texttt{network\_2} = Erd\H{o}s-R\'enyi random graph.}
+
+\noindent
+\textbf{Step 3: Identify the Flickr network.} \texttt{network\_5} is undirected with an extremely high average degree ($\langle k \rangle = 132.5$), the highest clustering coefficient ($C = 0.62$), and a power-law degree distribution. Social affiliation networks are characteristically dense with high transitivity \cite{barabasi1999emergence, newman2010networks}.
+
+\vspace{0.5em}
+\noindent
+$\Rightarrow$ \textbf{\texttt{network\_5} = Flickr social affiliation network.}
+
+\noindent
+\textbf{Step 4: Identify the Web graph.} \texttt{network\_1} is directed with moderate reciprocity (25.9\%, web pages often mutually link). It has high clustering ($C = 0.49$) and a power-law distribution with extreme hubs ($k_{\max} = 10{,}721$), consistent with popular hub pages in a university web graph \cite{barabasi2016network}.
+
+\vspace{0.5em}
+\noindent
+$\Rightarrow$ \textbf{\texttt{network\_1} = University Web graph.}
+
+\noindent
+\textbf{Step 5: Identify the citation network.} \texttt{network\_4} is directed with near-zero reciprocity (0.2\%), which is expected since citations are almost never mutual \cite{newman2010networks}. The median degree of 1 indicates many papers with very few citations. It has moderate clustering ($C = 0.16$) from co-citation patterns and a power-law tail ($k_{\max} = 2{,}803$) from a few highly-cited papers \cite{barabasi2016network}.
+
+\vspace{0.5em}
+\noindent
+$\Rightarrow$ \textbf{\texttt{network\_4} = CS citation network.}
+
+\noindent
+\textbf{Step 6: Identify the IMDb network.} \texttt{network\_3} is the remaining undirected network. It has a power-law degree distribution ($k_{\max} = 5{,}311$, prolific actors), average degree of 16.29, and zero clustering. The zero clustering suggests a bipartite actor-movie representation rather than a projected actor-actor graph, as bipartite graphs contain no odd cycles and thus no triangles \cite{newman2010networks}.
+
+\vspace{0.5em}
+\noindent
+$\Rightarrow$ \textbf{\texttt{network\_3} = IMDb actors collaboration network.}
+
+\vspace{1em}
+\noindent
+The code used to compute the structural properties:
+
+\lstinputlisting{network_identifier.py}
+
 \section{Who to vaccinate?}
 
 
@@ -283,6 +354,9 @@ The code used to produce the plot and compute the exponents:
 
   \bibitem{barabasi2016network}
   A.-L.~Barab\'asi, \emph{Network Science}, Cambridge University Press, 2016.
+
+  \bibitem{newman2010networks}
+  M.~E.~J.~Newman, \emph{Networks: An Introduction}, Oxford University Press, 2010.
 \end{thebibliography}
 
 \end{document}
