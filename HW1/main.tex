@@ -4,6 +4,7 @@
 \usepackage{amssymb}
 \usepackage{amsthm}
 \usepackage{graphicx}
+\usepackage{pdfpages}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 \usepackage{listings}
@@ -106,7 +107,7 @@ By Harary's theorem \cite{harary1969graph}, a disconnected graph on $n$ vertices
   This criterion is not practically useful for real networks. Most real-world graphs, like social networks \cite{barabasi1999emergence}, internet topology, and biological networks are sparse, with $m = O(n)$ or $O(n \log n)$, yet are typically connected. The threshold $\binom{n-1}{2} = O(n^2)$ is far too conservative. For instance, Erd\H{o}s and R\'enyi \cite{erdos1959random} showed that the sharp threshold for connectivity in the random graph $G(n,p)$ is $p = \frac{\ln n}{n}$, corresponding to $m \approx \frac{n \ln n}{2}$, which is much smaller than $O(n^2)$.
 \end{remark}
 
-
+\newpage
 \section{Node linking probability}
 
 We consider such a random graph $G$, where an edge between $i \in V(G)$ and $j \in V(G)$ is present with probability $p_{ij}$. The probability is proportional to $p_{ij} ~ v_i v_j$, where $v_i \geq 0$ is some number associated with node $i$.
@@ -185,6 +186,7 @@ Assume for a graph $G$. We design an algorithm which takes in a graph (network) 
   \]
 \end{proof}
 
+\newpage
 \section{Weak \& strong connectivity}
 
 For this section, we assume for a digraph $D$. If we were to apply the depth-first search (DFS hereon) to $D$ and take into account the three given criteria, the result would be:
@@ -250,6 +252,7 @@ The code used to produce the plot and compute the exponents:
 
 \lstinputlisting{lucene_analyser.py}
 
+\newpage
 \section{Five networks problem}
 
 We are given five networks in edge list format and must identify each by examining structural properties. Two of the networks are directed. We compute the following metrics for each network: number of nodes $n$, number of edges/arcs, average degree $\mathbb E (k)$, maximum degree, median degree, clustering coefficient $C$ (estimated via random sampling of 5000 nodes), and directedness (by comparing arc count to undirected edge count, if arcs $>$ undirected edges, the graph contains reciprocated directed edges).
@@ -323,6 +326,7 @@ The code used to compute the structural properties:
 
 \lstinputlisting{network_identifier.py}
 
+\newpage
 \section{Who to vaccinate?}
 
 The second scheme (vaccinate a random acquaintance) is strictly better.
@@ -361,5 +365,7 @@ This is due to the following: selecting a node uniformly at random yields an exp
   \bibitem{newman2010networks}
   M.~E.~J.~Newman, \emph{Networks: An Introduction}, Oxford University Press, 2010.
 \end{thebibliography}
+
+\includepdf[pages=1]{hw1.pdf}
 
 \end{document}
