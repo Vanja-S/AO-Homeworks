@@ -124,7 +124,7 @@ We consider such a random graph $G$, where an edge between $i \in V(G)$ and $j \
   \sum_{j \neq i} v_j\]
 
   \noindent
-  hence $\mathbb E(k_i) = Cv_i$, where $C = \alpha \sum_{j \neq i} v_j$ and $\alpha$ represents the unknown proportionality constant.
+  For large networks, any single $v_i$ is negligible compared to the total $S = \sum_j v_j$, so $\sum_{j \neq i} v_j = S - v_i \approx S$. Hence $\mathbb E(k_i) \approx Cv_i$, where $C = \alpha S$ is a constant independent of $i$, and $\alpha$ is the proportionality constant.
 \end{proof}
 
 
