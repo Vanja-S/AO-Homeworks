@@ -27,7 +27,7 @@
 
 \title{Homework \#2}
 \author{Vanja Stojanovi\'c}
-\date{March 2026}
+\date{April 2026}
 
 \begin{document}
 
@@ -64,7 +64,9 @@ Rank & Dolphin & Value & Rank & Dolphin & Value \\
 \end{tabular}
 \end{table}
 
-SN100 ranks 1st in both betweenness and closeness centrality despite only ranking 17th in degree ($k=7$). This confirms its role as broker, it bridges otherwise distant sub-communities rather than being a highly connected hub. Its low eigenvector centrality (rank 19) further indicates that its importance comes from its structural position, not from being connected to other hubs. The following is the Python implementation used to calculate the centrality measures.
+SN100 ranks 1st in both betweenness and closeness centrality despite only ranking 17th in degree ($k=7$). This confirms its role as broker, it bridges otherwise distant sub-communities rather than being a highly connected hub. Its low eigenvector centrality (rank 19) further indicates that its importance comes from its structural position, not from being connected to other hubs.  We can further confim this by looking at the neighbourhood of SN100: Beescratch, Kringel, MN60, SN4, SN89, SN9, Zap. These neighbours also appear high in the measures given in the Table \ref{tab:centrality} above, in particular SN4 is rank 2 in degree, and eigenvector centrality.
+
+The following is the Python implementation used to calculate the centrality measures.
 
 \lstinputlisting{centrality.py}
 
@@ -105,6 +107,7 @@ The following is the Python implementation used.
 
 \lstinputlisting{hiv_random_walk.py}
 
+\newpage
 \section{Ring graph modularity}
 
 
