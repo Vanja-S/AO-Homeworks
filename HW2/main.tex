@@ -9,6 +9,7 @@
 \usepackage{algpseudocode}
 \usepackage{booktabs}
 \usepackage{listings}
+\usepackage{tikz}
 \lstset{
   language=Python,
   basicstyle=\ttfamily\footnotesize,
@@ -109,7 +110,302 @@ The following is the Python implementation used.
 
 \newpage
 \section{Ring graph modularity}
+We calculate $Q$ as follows
+\begin{equation}
+  \label{eq:1}
+  Q = \sum_{s=1}^{c} \left[ \frac{l_s}{m} - \left(\frac{d_s}{2m}\right)^2 \right]
+\end{equation}
 
+\noindent
+where for each cluster $s$:
+
+\begin{itemize}
+  \item $l_s$ = number of edges within cluster $s$.
+  \item $d_s$ = sum of degrees of all nodes in cluster $s$
+  \item $m$ = total number of edges in the graph.
+\end{itemize}
+
+
+\begin{proposition}
+  \label{prop:3.1}
+  In a ring graph $G$ with $n = |V(G)| \geq 3$, it holds that $n = m = |E(G)|$.
+\end{proposition}
+
+\begin{proof}
+  We follow by induction on $n$.
+
+  \noindent
+  \textbf{Base case ($n = 3$).} Trivially follows from the illustration below.
+  \begin{center}
+    \begin{tikzpicture}[every node/.style={circle, draw, fill=black!10, inner sep=1.5pt, minimum size=6mm}]
+      \node (v1) at (90:1.2)  {$v_1$};
+      \node (v2) at (210:1.2) {$v_2$};
+      \node (v3) at (330:1.2) {$v_3$};
+      \draw (v1) -- (v2) -- (v3) -- (v1);
+    \end{tikzpicture}
+  \end{center}
+
+  \noindent
+  \textbf{Induction step.} We argue the statement holds for $n + 1$. Let $G$ be a ring graph with $n$ vertices, then by the induction hypothesis it has exactly $n$ edges. We add a vertex $z$ to this graph and connect it to an arbitrary neighbouring vertex pair which w.l.o.g. we denote $x,y$. To adhere to the constraints of the ring graph, we must partition the edge $xy$ into two parts, $xz$ and $zy$. The new graph has exactly $n + 1$ vertices, and $n + 1$ edges.
+\end{proof}
+
+\begin{proposition}
+  \label{prop:3.2}
+  In a ring graph $G$ partitioned into $c \geq 2$ consecutive clusters, $l_s = n_c - 1$ for every cluster $s$.
+\end{proposition}
+
+\begin{proof}
+  Since $c \geq 2$, each cluster consists of $n_c$ consecutive nodes on the ring and the induced subgraph is a path $P_{n_c}$ on $n_c$ vertices. A path on $k$ vertices has $k-1$ edges, so $l_s = |E(P_{n_c})| = n_c - 1$.
+\end{proof}
+
+\begin{proposition}
+  \label{prop:3.3}
+  In a ring graph $G$, $d_s = 2n_c$.
+\end{proposition}
+
+\begin{proof}
+  In a ring graph all vertices have degree 2, due to the graph construction constraints. This implies that the sum of degrees of all nodes in a cluster $s$ is equal to $2n_c$.
+\end{proof}
+
+\newpage
+\begin{theorem}
+  For a ring graph $G$ partitioned into $c \geq 2$ consecutive clusters of size $n_c$, the modularity can be expressed as
+  \[
+    Q = 1 - \frac{1}{n_c} - \frac{n_c}{n}.
+  \]
+\end{theorem}
+
+\begin{proof}
+  Substituting Propositions \ref{prop:3.1}--\ref{prop:3.3} into Eq.~\ref{eq:1}, the summand is independent of $s$, so
+  \[
+    Q = \sum_{s=1}^{c} \left[ \frac{n_c - 1}{n} - \left(\frac{n_c}{n}\right)^2 \right] = c \left[ \frac{n_c - 1}{n} - \frac{n_c^2}{n^2} \right].
+  \]
+  Using $c = n/n_c$,
+  \[
+    Q = \frac{n}{n_c}\left[\frac{n_c - 1}{n} - \frac{n_c^2}{n^2}\right] = \frac{n_c - 1}{n_c} - \frac{n_c}{n} = 1 - \frac{1}{n_c} - \frac{n_c}{n}.
+  \]
+\end{proof}
+
+We search for the cluster size $n_c$ that maximizes the modularity of such a ring graph, i.e.
+\[
+  n_c^{\star} = \arg\max_{\,n_c \,\mid\, n}\; Q(n_c) = \arg\max_{\,n_c \,\mid\, n}\;\left[1 - \frac{1}{n_c} - \frac{n_c}{n}\right],
+\]
+where $n_c \in \{2, \ldots, n\}$ and $n_c \mid n$.
+
+\begin{theorem}
+  \label{thm:3.5}
+  Let $n$ be a perfect square with $n \geq 4$. The unique maximizer of $Q$ over the set of divisors $\mathcal{D} = \{d \in \mathbb{Z} : d \mid n,\, 2 \leq d \leq n\}$ is
+  \[
+    n_c^{\star} = \sqrt{n}, \qquad \text{with optimal value} \qquad Q^{\star} = 1 - \frac{2}{\sqrt{n}}.
+  \]
+\end{theorem}
+
+\begin{proof}
+  Define the continuous relaxation $f : (0, \infty) \to \mathbb{R}$ by
+  \[
+    f(x) = 1 - \frac{1}{x} - \frac{x}{n},
+  \]
+  so that $Q(n_c) = f(n_c)$ for every $n_c \in \mathcal{D}$. The function $f$ is twice differentiable on $(0, \infty)$ with
+  \[
+    f'(x) = \frac{1}{x^2} - \frac{1}{n}, \qquad f''(x) = -\frac{2}{x^3}.
+  \]
+  Since $f''(x) < 0$ for all $x > 0$, $f$ is strictly concave on $(0, \infty)$.
+
+  \noindent
+  Setting $f'(x) = 0$ gives $x^2 = n$, hence $x = \sqrt{n}$ (the negative root is discarded). By strict concavity this is the unique global maximizer of $f$ on $(0, \infty)$, and
+  \[
+    f(\sqrt{n}) = 1 - \frac{1}{\sqrt{n}} - \frac{\sqrt{n}}{n} = 1 - \frac{2}{\sqrt{n}}.
+  \]
+
+  \noindent
+  Since $n$ is a perfect square, $\sqrt{n} \in \mathbb{Z}$. Moreover $\sqrt{n} \mid n$, since $n = \sqrt{n} \cdot \sqrt{n}$. For $n \geq 4$ we have $\sqrt{n} \geq 2$, so $\sqrt{n} \in \mathcal{D}$.
+
+  \noindent
+  For every $n_c \in \mathcal{D}$, $Q(n_c) = f(n_c)$. Since $\sqrt{n}$ is the unique maximizer of $f$ on $(0, \infty) \supseteq \mathcal{D}$, it follows that $\sqrt{n}$ is the unique maximizer of $Q$ on $\mathcal{D}$.
+\end{proof}
+
+\begin{corollary}
+  \label{cor:3.6}
+  The optimal partition itself is \emph{not} unique: any cyclic rotation of the cut points yields a distinct partition achieving $Q^{\star}$. Concretely, there are exactly $n_c^{\star} = \sqrt{n}$ rotationally distinct optima.
+\end{corollary}
+
+\begin{proof}
+  Label the vertices $0, 1, \ldots, n-1$ around the ring. The cyclic group $\mathbb{Z}/n\mathbb{Z}$ acts on the vertex set by $i \mapsto i + r \pmod{n}$, and this action preserves the edge set, vertex degrees, and cluster sizes. Hence rotating any optimum partition produces another partition with the same value of $Q$. The stabilizer of an optimum partition consists of rotations by multiples of $n_c^{\star}$, a subgroup of order $c = n / n_c^{\star} = \sqrt{n}$. By the orbit--stabilizer theorem, the orbit has size $|\mathbb{Z}/n\mathbb{Z}| / \sqrt{n} = n / \sqrt{n} = \sqrt{n}$ distinct partitions.
+\end{proof}
+
+\begin{remark}
+  Theorem~\ref{thm:3.5} gives $Q^{\star} = 1 - 2/\sqrt{n} \to 1$ as $n \to \infty$, despite the ring being a vertex-transitive graph with no genuine community structure. Combined with Corollary~\ref{cor:3.6}, this illustrates a known pathology of modularity optimization: it returns spurious, highly-modular partitions even on homogeneous graphs, and the optimum is degenerate under symmetries of the underlying graph. Applying modularity optimization to a ring graph is therefore not particularly meaningful.
+\end{remark}
+
+\newpage
+\section{Who's the winner?}
+
+We compare three community detection algorithms drawn from different paradigms:
+\begin{itemize}
+  \item \textbf{Leiden} [TWVE19] -- modularity optimization (\texttt{leidenalg}).
+  \item \textbf{FLPA} -- fast label propagation (NetworkX).
+  \item \textbf{Infomap} -- map equation / random walks (\texttt{python-igraph}).
+\end{itemize}
+For each experiment we run 25 graph realizations per parameter value and report the average.
+
+\subsection*{(i) Girvan--Newman benchmark}
+
+Three groups of 24 nodes with expected node degree $\langle k \rangle = 20$. The mixing parameter $\mu$ controls the fraction of expected edges placed between groups; the within- and between-group edge probabilities are
+\[
+  p_{\text{in}} = \frac{(1-\mu)\langle k \rangle}{n_g - 1}, \qquad p_{\text{out}} = \frac{\mu \langle k \rangle}{n_g(c-1)},
+\]
+which keeps the expected degree of each node equal to $\langle k \rangle$ regardless of $\mu$.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.7\textwidth]{plots/gn_nmi.pdf}
+  \caption{Average NMI over 25 GN benchmark realizations vs.\ mixing parameter $\mu$.}
+  \label{fig:gn-nmi}
+\end{figure}
+
+\textbf{Discussion.} Leiden is the clear winner: it stays at NMI $\geq 0.97$ up through $\mu = 0.4$ and only drops to $0.45$ at the detectability threshold $\mu = 0.5$, where the within- and between-group expected degrees are nearly equal. Infomap matches Leiden up to $\mu = 0.3$ but collapses sharply at $\mu = 0.4$, its random walks no longer get trapped inside the planted groups. FLPA degrades earliest because label propagation has no global optimization step; once between-group ties are dense enough, labels leak across groups during a single sweep.
+
+The GN benchmark code is given below.
+
+\lstinputlisting{gn_benchmark.py}
+
+\subsection*{(ii) LFR benchmark}
+
+LFR graphs with $n = 2500$ nodes, power-law degree exponent $\tau_1 = 2.5$, community-size exponent $\tau_2 = 1.5$, average degree $20$, max degree $50$, and community sizes in $[20, 100]$.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.7\textwidth]{plots/lfr_nmi.pdf}
+  \caption{Average NMI over 25 LFR realizations vs.\ mixing parameter $\mu$.}
+  \label{fig:lfr-nmi}
+\end{figure}
+
+\textbf{Discussion.} The picture is genuinely different from (i). At $\mu \in \{0.2, 0.4\}$ \textbf{Infomap} is the best (NMI $\approx 1.0$ and $0.99$), beating Leiden. This is because LFR has heterogeneous community sizes: Leiden's modularity score has a known resolution limit and tends to merge small communities, while Infomap's compression objective is essentially size-agnostic. However, both Infomap and FLPA collapse to NMI $\approx 0$ at $\mu = 0.6$, whereas Leiden retains a nontrivial signal (NMI $\approx 0.32$). At $\mu = 0.8$ all three fail. So Infomap wins in the easy/intermediate regime but Leiden is the most robust into the high-mixing regime.
+
+\subsection*{(iii) Erd\H{o}s--R\'enyi robustness}
+
+Random graphs with $n = 1000$ and average degree $\langle k \rangle \in \{8, 16, 24, 32, 40\}$. The ground truth is the connected-component partition; we report normalized variation of information $\text{NVI}(X, Y) = \text{VI}(X, Y) / \log n \in [0, 1]$ between the algorithm output and the components.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.7\textwidth]{plots/er_nvi.pdf}
+  \caption{Average NVI over 25 ER realizations vs.\ average degree (lower is more robust).}
+  \label{fig:er-nvi}
+\end{figure}
+
+\textbf{Discussion.} \textbf{FLPA is fully robust}: NVI $\approx 0$ for all densities, when there is no community signal, label propagation just collapses everything to one label per component. \textbf{Infomap} is robust for $\langle k \rangle \geq 16$ (NVI $= 0$), and only struggles in the very sparse regime $\langle k \rangle = 8$ where the graph has many small components and the random walk gets trapped in micro-clusters. \textbf{Leiden is the least robust}: it consistently reports NVI $\approx 0.3$, hallucinating communities at every density. This is the same modularity pathology we saw analytically on the ring graph in Section~\ref{thm:3.5}, modularity has a positive maximum even on graphs with no community structure, so Leiden returns a non-trivial partition by construction.
+
+\textbf{Summary.} Leiden wins on GN, Infomap wins on LFR (in the detectable regime), FLPA and Infomap win on ER robustness. There is no winner, the right algorithm depends on whether community sizes are homogeneous (favours Leiden), heterogeneous (favours Infomap), or whether one is concerned about false positives on structureless graphs (avoid Leiden).
+
+The full implementation of the experiments is given below.
+
+\lstinputlisting{community_detection.py}
+
+\newpage
+\section{Get at least 70\% right}
+
+We are given an APS citation network of $n = 90{,}162$ papers and $429{,}650$ directed citation arcs, published in 10 journals between 2008 and 2013. The training set consists of all 74{,}467 papers from 2008-2012 (journal known); the test set is the 15{,}695 papers from 2013.
+
+\subsection*{Strategy: citation-profile multinomial logistic regression}
+
+For each paper $v$ we extract a 30-dimensional feature vector that summarises the journal mix of the labelled papers $v$ cites (i.e.\ its out-neighbours that fall in 2008-2012). Concretely, let $c_{v,j}$ be the count of $v$'s labelled out-neighbours that belong to journal $j \in \{1, \ldots, 10\}$. The feature vector is the concatenation
+\[
+  \phi(v) = \big[\, c_{v,1}, \ldots, c_{v,10} \;\big|\; \log(1 + c_{v,1}), \ldots, \log(1 + c_{v,10}) \;\big|\; p_{v,1}, \ldots, p_{v,10} \,\big] \in \mathbb{R}^{30},
+\]
+where $p_{v,j} = c_{v,j} / \sum_{j'} c_{v,j'}$ is the citation proportion. A multinomial logistic regression is then fit on $\{(\phi(v), y_v) : v \in \text{2008-2012}\}$ using the SAGA solver, and its predictions on $\{\phi(v) : v \in 2013\}$ are taken as the predicted journals.
+
+\subsection*{Motivation}
+
+Each APS journal has a characteristic citation pattern: a Phys.\ Rev.\ B paper cites mostly Phys.\ Rev.\ B, while a Phys.\ Rev.\ Letters paper draws from a broader pool. The plain majority-vote baseline only uses the \emph{mode} of this distribution and discards the rest. Logistic regression instead lets the entire citation profile contribute, weighting each journal by a learned coefficient. The three feature blocks complement each other:
+\begin{itemize}
+  \item raw counts encode citation \emph{volume} per journal;
+  \item $\log(1 + c)$ compresses heavy tails so a single highly-cited review paper does not dominate;
+  \item proportions remove the absolute scale and isolate the \emph{shape} of the profile.
+\end{itemize}
+Out-edges (papers cited by $v$) are used because they are guaranteed labelled (older papers); in-edges from 2013 are mostly unlabelled and we found they only add noise.
+
+\subsection*{Results}
+
+\begin{table}[h]
+\centering
+\caption{Test-set classification accuracy on the 15{,}695 papers from 2013.}
+\begin{tabular}{lr}
+\toprule
+Method & Accuracy \\
+\midrule
+Baseline (most frequent journal among labelled neighbours)        & $0.6722$ \\
+Citation-profile LR (mean of 10 runs, std $< 10^{-4}$)            & $\mathbf{0.7216}$ \\
+\midrule
+Improvement over baseline                                          & $+4.94$ pp \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Per-run accuracies were $\{0.7215, 0.7215, 0.7216, 0.7216, 0.7216, 0.7216, 0.7216, $\\ $ 0.7216, 0.7216, 0.7216\}$ across 10 SAGA seeds, so the strategy is essentially deterministic up to floating-point noise. The baseline reproduces the spec's $\approx 67\%$ figure exactly, and the strategy exceeds the $\geq 70\%$ target by roughly two percentage points.
+
+\lstinputlisting{journal_prediction.py}
+
+\newpage
+\section{Peers, ties and the Internet}
+
+We compare three link prediction indices that each isolate a different structural property:
+\begin{itemize}
+  \item \textbf{Preferential attachment} [LNK07]: $s_{ij} = k_i\, k_j$.
+  \item \textbf{Adamic--Adar} [AA03]: $s_{ij} = \sum_{x \in \Gamma_i \cap \Gamma_j} \tfrac{1}{\log k_x}$.
+  \item \textbf{Community (block)}: with $\{c\}$ from Leiden modularity optimization [TWVE19] on the training graph,
+  \[
+    s_{ij} =
+    \begin{cases}
+      m_{c} \big/ \binom{n_{c}}{2}, & c_i = c_j = c, \\[2pt]
+      m_{c_i, c_j} \big/ (n_{c_i} n_{c_j}), & c_i \ne c_j,
+    \end{cases}
+  \]
+  where $m_c$ is the number of edges inside community $c$, $m_{c,c'}$ is the number of train edges between communities $c$ and $c'$, and $n_c$ is the size of $c$. This is the maximum-likelihood block density of an SBM fitted to the Leiden partition.
+\end{itemize}
+
+\subsection*{Framework}
+
+Each run hides a uniformly random $10\%$ of the edges as the test set, builds the training graph from the remaining $90\%$, runs Leiden on the training graph, and approximates AUC by Mann-Whitney sampling: draw $N = 10{,}000$ random pairs $(e_{\text{pos}}, e_{\text{neg}})$ where $e_{\text{pos}}$ is a test edge and $e_{\text{neg}}$ is a pair that is not an edge of the original graph; count $\hat{\mathrm{AUC}} = (\#\{s(e_{\text{pos}}) > s(e_{\text{neg}})\} + \tfrac{1}{2} \#\{\text{ties}\}) / N$. The four networks are:
+\begin{itemize}
+  \item ER: $n = 25{,}000$, $\langle k \rangle = 10$ (regenerated each run).
+  \item Circles: small Facebook social-circles sample ($n = 4{,}039$, $m = 88{,}234$).
+  \item Gnutella: P2P file-sharing ($n = 62{,}586$, $m = 147{,}892$, undirected).
+  \item nec: Internet AS-level overlay ($n = 75{,}885$, $m = 357{,}317$, undirected).
+\end{itemize}
+
+\subsection*{(x) Brief answer}
+
+Each network is won by the method whose structural assumption it most embodies. Erd\H{o}s--R\'enyi has no exploitable structure, so all three indices score $\approx 0.5$. The Facebook social-circles graph is dominated by triadic closure, so Adamic--Adar wins. Gnutella is scale-free but unclustered, so preferential attachment is the only useful signal. The AS-level Internet is hierarchically organised, so the community block index wins, with PA a strong runner-up because of Tier-1 hubs.
+
+\subsection*{(z) AUC results and per-network discussion}
+
+\begin{table}[h]
+\centering
+\caption{Mean AUC $\pm$ standard deviation over 10 runs. Best method per network in \textbf{bold}.}
+\label{tab:lp-auc}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Network   & PA               & Adamic--Adar     & Community \\
+\midrule
+ER        & $0.502 \pm 0.006$ & $0.500 \pm 0.000$ & $0.497 \pm 0.004$ \\
+Circles   & $0.833 \pm 0.004$ & $\mathbf{0.994 \pm 0.001}$ & $0.973 \pm 0.002$ \\
+Gnutella  & $\mathbf{0.717 \pm 0.006}$ & $0.515 \pm 0.001$ & $0.510 \pm 0.008$ \\
+nec       & $0.823 \pm 0.003$ & $0.695 \pm 0.007$ & $\mathbf{0.923 \pm 0.002}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{ER ($\langle k\rangle = 10$). Winner: none.} All three indices score essentially $0.5$, i.e.\ pure chance. ER has none of the three structural cues that the indices exploit: degrees are concentrated around the mean (no preferential-attachment signal), the clustering coefficient is $\approx p \approx 4\!\times\!10^{-4}$ (no triangles to feed Adamic--Adar), and Leiden hallucinates $\approx 17$ communities of roughly equal block density (so the community score is uninformative, as we proved analytically for the ring graph in Section~\ref{thm:3.5}). The result confirms that none of the methods produce false positives on a structureless graph.
+
+\textbf{Circles (Facebook). Winner: Adamic--Adar.} AA wins decisively at $0.994$, with the community method close behind at $0.973$. This is the prototypical social-network setting: a missing friendship between two people who already have many friends in common is overwhelmingly likely to actually exist (triadic closure). Communities are also tight, so the block index is almost as good. PA is the weakest of the three because in a small ego-network the degree variance is moderate, there are no extreme hubs, so $k_i k_j$ does not separate true links from random pairs nearly as well.
+
+\textbf{Gnutella P2P. Winner: preferential attachment.} PA dominates ($0.717$) while Adamic--Adar and Community both collapse to near-random ($0.515$, $0.510$). Gnutella has a heavily skewed degree distribution (a few super-peers and a long tail of leaf nodes) but extremely low clustering, i.e. P2P queries between strangers do not produce triangles, so the Adamic--Adar intersection is almost always empty. Leiden, in turn, produces $\approx 3{,}000$ tiny communities on the training graph, none of which capture meaningful structure, so the block density is essentially noise. Only the degree signal survives, and it is exactly preferential-attachment.
+
+\textbf{nec (Internet AS-level). Winner: community.} The community index wins at $0.923$, with PA in second at $0.823$ and Adamic--Adar a distant third at $0.695$. The AS-level Internet has a strong block / tier structure (regional ISPs, transit providers, customer cones) which Leiden recovers as $\approx 800$ medium-sized communities, and these blocks are precisely where most missing links lie. PA also performs well because the AS graph is famously scale-free with extreme hubs (Tier-1 carriers). Adamic--Adar is moderate but limited because the Internet is sparse on triangles compared to a social graph, transit relationships are structured rather than triadic.
+
+\subsection*{(y) Implementation}
+
+\lstinputlisting{link_prediction.py}
 
 \includepdf[pages=1]{hw2.pdf}
 
